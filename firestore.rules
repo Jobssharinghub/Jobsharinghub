@@ -1,0 +1,79 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: applications
+// Document ID: auto-generated
+// Fields:
+//   - firstName: string (required)
+//   - lastName: string (required)
+//   - country: string (required, Jordan or UAE)
+//   - industry: string (required)
+//   - degreeType: string (required)
+//   - school: string (required)
+//   - major: string (required)
+//   - yearsOfExperience: string (required)
+//   - location: string (required)
+//   - phoneNumber: string (required)
+//   - cvUrl: string (required)
+//   - agreedToPolicy: boolean (required, must be true)
+//   - createdAt: timestamp (required)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidApplication(data) {
+      return data.firstName is string && data.firstName.size() > 0 && data.firstName.size() < 100 &&
+             data.lastName is string && data.lastName.size() > 0 && data.lastName.size() < 100 &&
+             data.country in ['Jordan', 'UAE'] &&
+             data.industry is string && data.industry.size() > 0 &&
+             data.degreeType is string && data.degreeType.size() > 0 &&
+             data.school is string && data.school.size() > 0 &&
+             data.major is string && data.major.size() > 0 &&
+             data.yearsOfExperience is string && data.yearsOfExperience.size() > 0 &&
+             data.location is string && data.location.size() > 0 &&
+             data.phoneNumber is string && data.phoneNumber.size() > 0 &&
+             data.cvUrl is string && data.cvUrl.size() > 0 &&
+             data.agreedToPolicy == true &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /applications/{applicationId} {
+      // Allow anyone to create an application (no login required as per user request)
+      // But we still validate the data strictly.
+      allow create: if isValidApplication(request.resource.data) && 
+                       hasRequiredFields(['firstName', 'lastName', 'country', 'industry', 'degreeType', 'school', 'major', 'yearsOfExperience', 'location', 'phoneNumber', 'cvUrl', 'agreedToPolicy', 'createdAt']);
+      
+      // Only authenticated admins can read applications.
+      allow read, list: if isAuthenticated() && 
+                       (request.auth.token.email == "twalmoneer@gmail.com" || 
+                        request.auth.token.email == "recruitment@jobssharinghub.com");
+      
+      // No updates or deletes for now to keep it simple and secure.
+      allow update, delete: if false;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "application": {
+      "title": "Job Application",
+      "description": "A job application submitted by a candidate.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string", "description": "Candidate's first name" },
+        "lastName": { "type": "string", "description": "Candidate's last name" },
+        "country": { "type": "string", "description": "Candidate's country (Jordan, UAE)" },
+        "industry": { "type": "string", "description": "Industry of the candidate" },
+        "degreeType": { "type": "string", "description": "Type of degree (Bachelor's, Master's, etc.)" },
+        "school": { "type": "string", "description": "School or University name" },
+        "major": { "type": "string", "description": "Major of study" },
+        "yearsOfExperience": { "type": "string", "description": "Years of experience" },
+        "location": { "type": "string", "description": "Candidate's specific location/city" },
+        "phoneNumber": { "type": "string", "description": "Candidate's phone number" },
+        "cvUrl": { "type": "string", "description": "URL to the uploaded CV file" },
+        "agreedToPolicy": { "type": "boolean", "description": "Whether the candidate agreed to the policy" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the application was submitted" }
+      },
+      "required": ["firstName", "lastName", "country", "industry", "degreeType", "school", "major", "yearsOfExperience", "location", "phoneNumber", "cvUrl", "agreedToPolicy"]
+    }
+  },
+  "firestore": {
+    "/applications/{applicationId}": {
+      "schema": "application",
+      "description": "Collection of job applications"
+    }
+  }
+}
